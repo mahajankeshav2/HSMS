@@ -1,0 +1,1249 @@
+******Entity*********
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HSocietyEntity
+{
+    [Serializable]
+
+    public class HSEntity
+    {
+        public string ComplaintId { get; set; }
+
+        public string Category { get; set; }
+
+        public string Block { get; set; }
+
+        public int FlatNo { get; set; }
+
+        public DateTime cDate { get; set; }
+
+        public string Description { get; set; }
+
+    }
+   
+}
+
+*********Exception*********
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HSocietyException
+{
+    public class HSException : ApplicationException
+    {
+        public HSException() : base() { }
+
+        public HSException(string message) : base(message) { }
+
+        public HSException(string message, Exception innerException) : base(message, innerException) { }
+
+    }
+}
+
+************DAL*************
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HSocietyEntity;
+using HSocietyException;
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
+
+namespace HSocietyDAL
+{
+    public class HSDAL
+    {
+        public static List<HSEntity> cList = new List<HSEntity>();
+        public static string fileNameComplaint = "ComplaintDetails.obj";
+
+        public static bool AddComplaintDetailsDAL(HSEntity complaint)
+
+        {
+
+            bool isCAdded = false;
+
+            try
+
+            {
+
+                cList.Add(complaint);
+
+                Serialization();
+
+                isCAdded = true;
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
+            return isCAdded;
+
+        }
+
+        
+
+        public static List<HSEntity> ListComplaintDetailsDAL()
+
+        {
+
+            return cList;
+
+        }
+
+   
+
+
+
+        public static bool DeleteComplaintDetailsDAL(String cID)
+
+        {
+
+            bool isCDeleted = false;
+
+            try
+
+            {
+
+                foreach (var com in cList)
+
+                {
+
+                    if (com.ComplaintId.Equals(cID))
+
+                    {
+
+                        cList.Remove(com);
+
+                        isCDeleted = true;
+
+                        Serialization();
+
+                        break;
+
+                    }
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
+            return isCDeleted;
+
+        }
+        
+        public static bool UpdateComplaintDetailDAL(HSEntity updatedComplaint)
+
+        {
+
+            bool isCUpdated = false;
+
+            try
+
+            {
+
+                int i = 0;
+
+                foreach (var com in cList)
+
+                {
+
+                    if (com.ComplaintId.Equals(updatedComplaint.ComplaintId))
+
+                    {
+
+                        cList[i] = updatedComplaint;
+
+                        isCUpdated = true;
+
+                        Serialization();
+
+                        break;
+
+                    }
+
+                    i++;
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
+            return isCUpdated;
+
+        }
+        public static HSEntity SearchComplaintDAL(int fNo)
+
+        {
+
+            HSEntity cSearch = null;
+
+            try
+
+            {
+
+                foreach (var com in cList)
+
+                {
+
+                    if (com.FlatNo.Equals(fNo))
+
+                    {
+
+                        cSearch = com;
+
+                    }
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
+            return cSearch;
+
+        }
+
+
+        public static HSEntity SearchComplaintByComplaintIDDAL(string cID)
+
+        {
+
+            HSEntity cSearch = null;
+
+            try
+
+            {
+
+                foreach (var com in cList)
+
+                {
+
+                    if (com.ComplaintId.Equals(cID))
+
+                    {
+
+                        cSearch = com;
+
+                    }
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
+            return cSearch;
+
+        }
+
+        public static void Serialization()
+
+        {
+
+            try
+
+            {
+
+      
+
+                using (Stream file = File.Open(fileNameComplaint, FileMode.Create))
+
+                {
+
+                    BinaryFormatter formatter = new BinaryFormatter();
+
+                    formatter.Serialize(file, cList);
+
+                    file.Close();
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+
+        }
+
+        public static void DeSerialization()
+
+        {
+
+            try
+
+            {
+
+                using (Stream file = File.Open(fileNameComplaint, FileMode.Open))
+
+                {
+
+                    BinaryFormatter formatter = new BinaryFormatter();
+
+                    cList = (List<HSEntity>)formatter.Deserialize(file);
+
+                    file.Close();
+
+                }
+
+
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
+
+        }
+
+    }
+}
+
+**********BL***********
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Text.RegularExpressions;
+using HSocietyEntity;
+using HSocietyException;
+using HSocietyDAL;
+using System.IO;
+
+namespace HSocietyBL
+{
+    public class HSBL
+    {
+        public static bool ValidateComplaint(HSEntity complaint)
+
+        {
+
+            bool validateComplaint = true;
+
+            try
+
+            {
+
+
+                if (!Regex.IsMatch(complaint.ComplaintId, @"[A-Z][A-Z]-[0-9]{4}"))
+
+                {
+
+                    validateComplaint = false;
+
+                    throw new HSException("Id should be in particular format");
+
+                }              
+
+                if (complaint.Category != "Accounting" && complaint.Category != "Parking" && complaint.Category != "Electrical" && complaint.Category != "WaterLeakage")
+
+                {
+
+                    validateComplaint = false;
+
+                    throw new HSException("Category should be Accounting or Parking or Electrical or WaterLeakage");
+
+                }
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            return validateComplaint;
+
+        }
+
+
+        public static bool AddComplaintDetailsBLL(HSEntity complaint)
+
+        {
+
+            bool isComplaintAdded = false;
+
+            try
+
+            {
+
+                if (ValidateComplaint(complaint))
+
+                {
+
+                    isComplaintAdded = HSDAL.AddComplaintDetailsDAL(complaint);
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            return isComplaintAdded;
+
+        }
+
+
+
+      
+
+        public static List<HSEntity> ListComplaintDetailsBLL()
+
+        {
+
+            return HSDAL.ListComplaintDetailsDAL();
+
+        }
+
+
+
+
+
+        public static bool DeleteComplaintDetailsBLL(string cID)
+
+        {
+
+            bool isComplaintDeleted = false;
+
+            try
+
+            {
+
+                isComplaintDeleted = HSDAL.DeleteComplaintDetailsDAL(cID);
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            return isComplaintDeleted;
+
+        }
+
+      
+
+        public static bool UpdateComplaintDetailsBLL(HSEntity updatedComplaint)
+
+        {
+
+            bool isUserUpdated = false;
+
+            try
+
+            {
+
+                isUserUpdated = HSDAL.UpdateComplaintDetailDAL(updatedComplaint);
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            return isUserUpdated;
+
+        }
+
+        public static HSEntity SearchComplaintBLL(int fNo)
+
+        {
+
+            HSEntity complaint = null;
+
+            try
+
+            {
+
+                complaint = HSDAL.SearchComplaintDAL(fNo);
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            return complaint;
+
+        }
+        public static HSEntity SearchComplaintByComplaintIDBLL(string cID)
+
+        {
+
+            HSEntity complaint = null;
+
+            try
+
+            {
+
+                complaint = HSDAL.SearchComplaintByComplaintIDDAL(cID);
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+            return complaint;
+
+        }
+
+
+        public static void SerializeFile()
+
+        {
+
+            try
+
+            {
+
+                if (HSDAL.cList != null)
+
+                {
+
+                    HSDAL.Serialization();
+
+                }
+
+      
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+        }
+
+        public static void DeSerializeFile()
+
+        {
+
+            try
+
+            {
+
+                if (File.Exists(Directory.GetCurrentDirectory() + "\\" + HSDAL.fileNameComplaint))
+
+                {
+
+                    HSDAL.DeSerialization();
+
+                }
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                throw ex;
+
+            }
+            catch (Exception ex)
+
+            {
+
+                throw ex;
+
+            }
+
+        }
+
+
+
+    }
+}
+
+
+********PL**************
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HSocietyEntity;
+using HSocietyException;
+using HSocietyBL;
+
+namespace HSocietyPL
+{
+    class HSPL
+    {
+        static void Main(string[] args)
+        {
+
+            Deserialization();
+            try
+            {
+                int ch = 1;
+                do
+                {
+                    PrintChoiceOption();
+                    Console.Write("Enter your choice:");
+                    int choice = Int32.Parse(Console.ReadLine());
+                    switch (choice)
+                    {
+                        case 1:
+                            Console.WriteLine("1. Add Complaint");
+
+                            AddComplaintDetailsPL();
+
+                            break;
+
+                        case 2:
+
+                            Console.WriteLine("2. Edit Complaint");   
+
+                            UpdateComplaintDetailsPL();
+
+                            break;
+
+                        case 3:
+
+                            Console.WriteLine("3. Delete Complaint");
+
+                            DeleteComplaintDetailsPL();
+
+                            break;
+
+                        case 4:
+
+                            Console.WriteLine("4.  Search Complaint");
+
+                            SearchComplaintDetailsPL();
+
+                            break;
+
+
+                        case 5:
+
+                            Console.WriteLine("5.  View Complaint");
+
+                            DisplayAllComplaintPL();
+
+                            break;
+
+
+                        case 6:
+
+                            ch = -1;
+
+                            break;
+
+                        default:
+
+                            Console.WriteLine("Enter correct choice");
+
+                            Serialization();
+
+                            break;
+
+                    }
+
+                } while (ch != -1);
+
+                Console.WriteLine("Thanks for visiting!");
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+
+        public static void AddComplaintDetailsPL()
+
+        {
+
+            HSEntity complaint = new HSEntity();
+
+            try
+
+            {
+
+                Console.Clear();
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.WriteLine("                                 Add Complaint Details                           ");
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.Write("Enter the UserId(AA-0001):");
+
+                complaint.ComplaintId = Console.ReadLine();
+
+                Console.Write("Enter the Category:");
+
+                complaint.Category = Console.ReadLine();
+
+                Console.Write("Enter the Block:");
+
+                complaint.Block = Console.ReadLine();
+
+                Console.Write("Enter the Flat No.:");
+
+                complaint.FlatNo =Int32.Parse(Console.ReadLine());
+
+                //Console.Write("Enter the Date:");
+
+                complaint.cDate = DateTime.Now;
+
+                Console.Write("Enter the description:");
+
+                complaint.Description = Console.ReadLine();
+
+                Console.Clear();
+
+                Console.WriteLine("-----------------------------------------------------------------------------------");
+
+                bool complaintAdded = HSBL.AddComplaintDetailsBLL(complaint);
+
+                if (complaintAdded)
+
+                    Console.WriteLine("Complaint added successfully");
+
+                else
+
+                    Console.WriteLine("Details are not added ");
+
+                Console.WriteLine("-----------------------------------------------------------------------------------");
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+
+
+
+        static void DeleteComplaintDetailsPL()
+
+        {
+
+            try
+
+            {
+
+                Console.WriteLine("Enter ComplaintID");
+
+                string cID = Console.ReadLine();
+
+                bool isComplaintDeleted = HSBL.DeleteComplaintDetailsBLL(cID);
+
+                if (isComplaintDeleted)
+
+                {
+
+                    Console.WriteLine("Complaint details deleted");
+
+                }
+
+                else
+
+                    Console.WriteLine("Complaint details not deleted");
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+
+        public static void UpdateComplaintDetailsPL()
+
+        {
+
+            int fNo;
+
+            try
+
+            {
+
+                Console.Clear();
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.WriteLine("                                 Update Complaint Details                           ");
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.WriteLine("Enter the Flat No:");
+
+                fNo =Int32.Parse(Console.ReadLine());
+
+                HSEntity complaint = HSBL.SearchComplaintBLL(fNo);
+
+                if (complaint != null)
+
+                {
+                    complaint.ComplaintId = complaint.ComplaintId;
+
+                    Console.Write("Enter the Category:");
+
+                    complaint.Category = Console.ReadLine();
+
+                    Console.Write("Enter the Block:");
+
+                    complaint.Block = Console.ReadLine();
+
+                    Console.Write("Enter the Flat No.:");
+
+                    complaint.FlatNo = Int32.Parse(Console.ReadLine());
+
+                    //Console.Write("Enter the Date:");
+
+                    complaint.cDate = DateTime.Now;
+
+                    Console.Write("Enter the description:");
+
+                    complaint.Description = Console.ReadLine();
+
+                    bool complaintUpdated = HSBL.UpdateComplaintDetailsBLL(complaint);
+
+                    if (complaintUpdated)
+
+                        Console.WriteLine("Complaint Details are updated");
+
+                    else
+
+                        Console.WriteLine("Complaint Details are not updated");
+
+                }
+
+                else
+
+                    Console.WriteLine("Flat not found");
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+        public static void SearchComplaintDetailsPL()
+
+        {
+
+            string cID;
+
+            HSEntity complaint;
+
+            try
+
+            {
+
+                Console.Clear();
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.WriteLine("                                 Search Complaint                           ");
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.WriteLine("Enter the Complaint Id :(AA-0001)");
+
+                cID = Console.ReadLine();
+
+                complaint = HSBL.SearchComplaintByComplaintIDBLL(cID);
+
+                if (complaint != null)
+
+                {
+
+                    Console.WriteLine("complaint is found");
+
+                    Console.WriteLine("*********************************************************************************");
+
+                    Console.WriteLine("{0}*{1}*{2}*{3}*{4}*{5}", complaint.ComplaintId, complaint.Category, complaint.Block, complaint.FlatNo, complaint.cDate, complaint.Description);
+
+                    Console.WriteLine("*********************************************************************************");
+
+                }
+
+                else
+
+                    Console.WriteLine("complaint not found");
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+        public static void DisplayAllComplaintPL()
+
+        {
+
+            List<HSEntity> complaints = new List<HSEntity>();
+
+            try
+
+            {
+
+                Console.Clear();
+
+                Console.WriteLine("************************************************************************************");
+
+                Console.WriteLine("                                 Display All Complaints                           ");
+
+                Console.WriteLine("************************************************************************************");
+
+                complaints = HSBL.ListComplaintDetailsBLL();
+
+                Console.WriteLine("------------------------------------------------------------------------------------");
+
+                foreach (HSEntity com in complaints)
+
+                {
+
+                    Console.WriteLine("{0}*{1}*{2}*{3}*{4}*{5}", com.ComplaintId, com.Category, com.Block, com.FlatNo, com.cDate, com.Description);
+
+                    Console.WriteLine("------------------------------------------------------------------------------------");
+
+                }
+
+                Console.WriteLine("Press any key to continue!");
+
+                string hold = Console.ReadLine();
+
+                Console.Clear();
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+        public static void PrintChoiceOption()
+
+        {
+
+            Console.WriteLine("************************************************************************************");
+
+            Console.WriteLine("                                 Housing Society Management System                   ");
+
+            Console.WriteLine("************************************************************************************");
+
+            Console.WriteLine("1. Add Complaint"); 
+
+            Console.WriteLine("2. Edit Complaint");
+
+            Console.WriteLine("3. Delete Complaint");
+
+            Console.WriteLine("4. Search Complaint");
+
+            Console.WriteLine("5. View Complaint");
+
+            Console.WriteLine("6. Exit");
+
+            Console.WriteLine("************************************************************************************");
+
+        }
+        static void Serialization()
+
+        {
+
+            try
+
+            {
+
+                HSBL.SerializeFile();
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+        }
+
+        static void Deserialization()
+
+        {
+
+            try
+
+            {
+
+                HSBL.DeSerializeFile();
+
+            }
+
+            catch (HSException ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+
+            catch (Exception ex)
+
+            {
+
+                Console.WriteLine(ex.Message);
+
+            }
+        }
+    }
+}
